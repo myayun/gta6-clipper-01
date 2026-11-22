@@ -1,25 +1,42 @@
-// A working gta6-clipper-01 entry (Node 22, standard library only): it copies VIDEO.json from the repository root to
-// /output/VIDEO.json, where the gate reads it. That is all the program has to do. The entry is the video itself: your
-// agent finds a GTA 6 moment, cuts it into a vertical clip, the clip is uploaded to YouTube as a public Short or video
-// with the bounty's line and your play code in its description, VIDEO.json names the video, and the house reads the
-// video's views from YouTube. Nothing this program writes about the video is scored.
+// gta6-clipper-01 entry: hands the video's address to the gate.
+// The entry is the YouTube Short itself; this program only delivers
+// VIDEO.json (the video's address) from the repository to /output,
+// where the gate reads it. It also validates the address first so a
+// bad VIDEO.json fails loudly here instead of at grading time.
 //
-// The VIDEO.json this starter ships holds a placeholder address, so the gate refuses it as it stands (valid 0).
-// Replace it with your video's address before you submit.
-//
-// Outside the grader's container, MAKEFUN_BOT_DIR and MAKEFUN_OUTPUT_DIR stand in for /bot and /output:
-//   mkdir -p out && MAKEFUN_BOT_DIR=. MAKEFUN_OUTPUT_DIR=out node main.ts
+// Run locally: mkdir -p out && MAKEFUN_BOT_DIR=. MAKEFUN_OUTPUT_DIR=out node main.ts
 
-import { copyFileSync, mkdirSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-const BOT_DIR = process.env.MAKEFUN_BOT_DIR ?? '/bot';
-const OUTPUT_DIR = process.env.MAKEFUN_OUTPUT_DIR ?? '/output';
+const botDir = process.env.MAKEFUN_BOT_DIR ?? '/bot';
+const outDir = process.env.MAKEFUN_OUTPUT_DIR ?? '/output';
 
-mkdirSync(OUTPUT_DIR, { recursive: true });
+const src = join(botDir, 'VIDEO.json');
+const dst = join(outDir, 'VIDEO.json');
+
+let raw: string;
 try {
-  copyFileSync(join(BOT_DIR, 'VIDEO.json'), join(OUTPUT_DIR, 'VIDEO.json'));
+  raw = readFileSync(src, 'utf8');
 } catch (err) {
-  console.error(`VIDEO.json could not be copied from ${BOT_DIR}: ${(err as Error).message}`);
+  console.error(`cannot read ${src}: ${(err as Error).message}`);
   process.exit(1);
 }
+
+let entry: unknown;
+try {
+  entry = JSON.parse(raw);
+} catch (err) {
+  console.error(`${src} is not valid JSON: ${(err as Error).message}`);
+  process.exit(1);
+}
+
+const url = (entry as { url?: unknown }).url;
+if (typeof url !== 'string' || !/^https:\/\/(www\.youtube\.com|youtu\.be)\//.test(url)) {
+  console.error(`${src} must hold {"url": "<a youtube address>"}, got: ${raw.trim()}`);
+  process.exit(1);
+}
+
+mkdirSync(outDir, { recursive: true });
+writeFileSync(dst, raw);
+console.log(`wrote ${dst} (${url})`);

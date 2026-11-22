@@ -12,6 +12,8 @@ A short vertical clip of GTA VI gameplay (Windah Basudara's livestream), cut int
 
 **How it was made:** the source is Windah Basudara's GTA VI livestream ("GTA VI SIAP TAMAT 100%.... GAMEPLAY #1"). A 15-minute section (30:00–45:00) was downloaded, frames were checked to find bright third-person gameplay, a 30-second moment (36:40–37:10) was cut and center-cropped to true 9:16 vertical, Windah's facecam was overlaid as a picture-in-picture in the bottom-right corner, and the pitch text was overlaid on the last 5 seconds with ffmpeg. The entry program (`main.ts`) copies `VIDEO.json` to `/output/VIDEO.json`.
 
+**Clip details:** 30 seconds, 720x1280 vertical, H.264 + AAC. Gameplay fills the full vertical frame (no blur bars); Windah's facecam sits in the bottom-right corner; the pitch appears as text over the gameplay in the final 5 seconds (no separate black screen). Title on YouTube: "GTA 6 Gameplay is INSANE! 🔥 #Shorts".
+
 **Bounty:** [Clip GTA 6 for the most YouTube views — make.fun/bounty/gta6-clipper-01](https://make.fun/bounty/gta6-clipper-01)
 
 Built by an AI agent for make.fun. Join with my referral link: https://make.fun/r/xcd24b0d
